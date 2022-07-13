@@ -1,0 +1,101 @@
+@import "../styles/variables";
+@import "../styles/mixins";
+
+.slot-conteiner {
+  width: 100vw;
+  height: 100vh;
+  background-color: $slot-background;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 5vh 0;
+
+  &__interface {
+    margin-top: 5vh;
+    @include mediaQuery($desktop-large-width) {
+      width: 3 * $slot-icon-width-large-desktop;
+      height: 3 * $slot-icon-width-large-desktop;
+    }
+    @include mediaQuery($desktop-width) {
+      width: 3 * $slot-icon-width-desktop;
+      height: 3 * $slot-icon-width-desktop;
+    }
+    @include mediaQuery($tablet-width) {
+      width: 3 * $slot-icon-width-tablet;
+      height: 3 * $slot-icon-width-tablet;
+    }
+    @include mediaQuery($mobile-width) {
+      width: 3 * $slot-icon-width-mobile;
+      height: 3 * $slot-icon-width-mobile;
+    }
+
+    border: 1px solid black;
+    display: flex;
+    overflow: hidden;
+    background-color: $dark-gray;
+
+    .column {
+      @include mediaQuery($desktop-large-width) {
+        width: $slot-icon-width-large-desktop;
+      }
+      @include mediaQuery($desktop-width) {
+        width: $slot-icon-width-desktop;
+      }
+      @include mediaQuery($tablet-width) {
+        width: $slot-icon-width-tablet;
+      }
+
+      @include mediaQuery($mobile-width) {
+        width: $slot-icon-width-mobile;
+      }
+
+      border: 1px solid purple;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      .reel {
+        border: 1px solid green;
+        position: absolute;
+
+        & > div {
+          @include mediaQuery($desktop-large-width) {
+            min-width: $slot-icon-width-large-desktop;
+            width: $slot-icon-width-large-desktop;
+            min-height: $slot-icon-width-large-desktop;
+            height: $slot-icon-width-large-desktop;
+          }
+          @include mediaQuery($desktop-width) {
+            min-width: $slot-icon-width-desktop;
+            width: $slot-icon-width-desktop;
+            min-height: $slot-icon-width-desktop;
+            height: $slot-icon-width-desktop;
+          }
+          @include mediaQuery($tablet-width) {
+            min-width: $slot-icon-width-tablet;
+            width: $slot-icon-width-tablet;
+            min-height: $slot-icon-width-tablet;
+            height: $slot-icon-width-tablet;
+          }
+          @include mediaQuery($mobile-width) {
+            min-width: $slot-icon-width-mobile;
+            width: $slot-icon-width-mobile;
+            min-height: $slot-icon-width-mobile;
+            height: $slot-icon-width-mobile;
+          }
+
+          border: 1px solid orange;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        & > div > img {
+          height: 95%;
+          width: 80%;
+          object-fit: contain;
+          border: 1px solid black;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@100;300;400;500;600;700&display=swap");
+
+//FONTS
+$roboto-font-mono: "Roboto Mono", monospace;
+
+//COLORS
+$slot-background: #ccc;
+$dark-gray: #181818;
+
+//MEASURES
+//ovde je ideja da na osnovu dimenzija simbola dinamicki kreiramo sirinu i visinu kontejnera za slot
+$slot-icon-width-large-desktop: 130px;
+$slot-icon-width-desktop: 110px;
+$slot-icon-width-tablet: 90px;
+$slot-icon-width-mobile: 70px;
+
+
+//BREAKPOINTS
+$mobile-width: 480px;
+$tablet-width: 768px;
+$desktop-width: 1024px;
+$desktop-large-widht: 1440px;
+$desktop-large-width: 1980px;

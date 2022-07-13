@@ -1,5 +1,11 @@
+import Slot from "./components/Slot";
+
 function App() {
-  return <div className="App">Hello world!</div>;
+  return (
+    <>
+      <Slot />
+    </>
+  );
 }
 
 export default App;
