@@ -1,5 +1,6 @@
 import "./Slot.scss";
 import IMAGES from "../assets/images";
+import music from "../assets/audio/slot3.wav";
 
 import { useRef, useEffect, useState } from "react";
 
@@ -46,11 +47,18 @@ function Slot() {
   const reelOneRef = useRef(null);
   const childRef = useRef(null);
 
+  //za requestAnimationFrame
+  // const requestRef = useRef();
+  // const previousTimeRef = useRef();
+
   const [gameState, setGameState] = useState(initialState);
   const [reel1, setReel1] = useState([]);
   const [reel2, setReel2] = useState([]);
   const [reel3, setReel3] = useState([]);
   const [started, setStarted] = useState(false);
+
+  const [audio] = useState(new Audio(music));
+  const [playing, setPlaying] = useState(false);
 
   useEffect(() => {
     setReel1(initShuffleArray([...imageArray]));
@@ -58,36 +66,53 @@ function Slot() {
     setReel3(initShuffleArray([...imageArray]));
   }, []);
 
-  const animate = () => {
+  // useEffect(() => {
+  //   playing ? audio.play() : audio.pause();
+  // }, [playing]);
+
+  const animate = (time) => {
     const resetPosition =
       (gameState.numberOfSymbols / 2 - 3) * gameState.symbolHeight;
-    console.log(resetPosition);
-    console.log("ja sam resetovana pozicija");
-    setGameState((state) => {
-      return {
-        ...state,
-        reelsTopPosition: state.reelsTopPosition - state.delta,
-      };
-    });
-    console.log(gameState.reelsTopPosition);
-    if (gameState.reelsTopPosition <= resetPosition) {
-      resetPos();
-      console.log("resetovanooooooo");
-      console.log(gameState.reelsTopPosition);
+
+    if (previousTimeRef.current !== undefined) {
+      const deltaTime = time - previousTimeRef.current;
+      setGameState((state) => {
+        return {
+          ...state,
+          reelsTopPosition: state.reelsTopPosition - state.delta,
+        };
+      });
+      previousTimeRef.current = time;
+      requestRef.current = requestAnimationFrame(animate);
+      if (gameState.reelsTopPosition <= resetPosition) {
+        resetPos();
+      }
+      console.log(deltaTime);
+      console.log("ja sam delta timeeeeeeee");
     }
   };
 
-  useEffect(() => {
-    if (started) {
-      let timerId;
+  // useEffect(() => {
+  //   if (started) {
+  //     // setPlaying(true);
+  //     let timerId;
 
-      timerId = requestAnimationFrame(animate);
-      setTimeout(() => {
-        setStarted(false);
-      }, 2000);
-      return () => cancelAnimationFrame(timerId);
-    }
-  }, [started, gameState.reelsTopPosition]);
+  //     timerId = requestAnimationFrame(animate);
+  //     setTimeout(() => {
+  //       setStarted(false);
+  //       // setPlaying(false);
+  //     }, 4000);
+  //     return () => cancelAnimationFrame(timerId);
+  //   }
+  // }, [started, gameState.reelsTopPosition]);
+
+  // useEffect(() => {
+  //   requestRef.current = requestAnimationFrame(animate);
+
+  //   return () => {
+  //     cancelAnimationFrame(requestRef.current);
+  //   };
+  // }, [started, gameState.reelsTopPosition]);
 
   useEffect(() => {
     console.log(gameState.reelsTopPosition);
