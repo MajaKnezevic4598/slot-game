@@ -1,8 +1,9 @@
 import "./Slot.scss";
 import IMAGES from "../assets/images";
 import music from "../assets/audio/slot3.wav";
+import useAnimationFrame from "../hooks/useAnimationFrame";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useLayoutEffect } from "react";
 
 function Slot() {
   //imacemo 2 puta 12 symbola tj 24
@@ -46,10 +47,9 @@ function Slot() {
   const conteinerRef = useRef(null);
   const reelOneRef = useRef(null);
   const childRef = useRef(null);
-
-  //za requestAnimationFrame
-  // const requestRef = useRef();
-  // const previousTimeRef = useRef();
+  //za animaciju
+  const requestRef = useRef();
+  const previousTimeRef = useRef();
 
   const [gameState, setGameState] = useState(initialState);
   const [reel1, setReel1] = useState([]);
@@ -66,53 +66,48 @@ function Slot() {
     setReel3(initShuffleArray([...imageArray]));
   }, []);
 
-  // useEffect(() => {
-  //   playing ? audio.play() : audio.pause();
-  // }, [playing]);
+  useEffect(() => {
+    if (playing) {
+      audio.play();
+    }
+    if (!playing) {
+      if (audio.currentTime > 0) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+    }
+  }, [playing]);
 
-  const animate = (time) => {
+  const animate = () => {
     const resetPosition =
       (gameState.numberOfSymbols / 2 - 3) * gameState.symbolHeight;
 
-    if (previousTimeRef.current !== undefined) {
-      const deltaTime = time - previousTimeRef.current;
-      setGameState((state) => {
-        return {
-          ...state,
-          reelsTopPosition: state.reelsTopPosition - state.delta,
-        };
-      });
-      previousTimeRef.current = time;
-      requestRef.current = requestAnimationFrame(animate);
-      if (gameState.reelsTopPosition <= resetPosition) {
-        resetPos();
-      }
-      console.log(deltaTime);
-      console.log("ja sam delta timeeeeeeee");
+    setGameState((state) => {
+      return {
+        ...state,
+        reelsTopPosition: state.reelsTopPosition - state.delta,
+      };
+    });
+    if (gameState.reelsTopPosition <= resetPosition) {
+      resetPos();
     }
   };
 
-  // useEffect(() => {
-  //   if (started) {
-  //     // setPlaying(true);
-  //     let timerId;
+  useEffect(() => {
+    if (started) {
+      let timerId;
+      timerId = requestAnimationFrame(animate);
+      setPlaying(true);
+      setTimeout(() => {
+        setStarted(false);
+        setPlaying(false);
+      }, 3000);
 
-  //     timerId = requestAnimationFrame(animate);
-  //     setTimeout(() => {
-  //       setStarted(false);
-  //       // setPlaying(false);
-  //     }, 4000);
-  //     return () => cancelAnimationFrame(timerId);
-  //   }
-  // }, [started, gameState.reelsTopPosition]);
-
-  // useEffect(() => {
-  //   requestRef.current = requestAnimationFrame(animate);
-
-  //   return () => {
-  //     cancelAnimationFrame(requestRef.current);
-  //   };
-  // }, [started, gameState.reelsTopPosition]);
+      return () => {
+        cancelAnimationFrame(timerId);
+      };
+    }
+  }, [started, gameState.reelsTopPosition]);
 
   useEffect(() => {
     console.log(gameState.reelsTopPosition);
@@ -221,7 +216,7 @@ function Slot() {
       </section>
       <button
         onClick={() => {
-          setStarted(true);
+          setStarted(!started);
         }}
       >
         Spin

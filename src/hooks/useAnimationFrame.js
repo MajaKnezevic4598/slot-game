@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
 
-const useAnimationFrame = (callback, isSpining = false) => {
+const useAnimationFrame = (callback) => {
   // Use useRef for mutable variables that we want to persist
   // without triggering a re-render on their change
   const requestRef = useRef();
   const previousTimeRef = useRef();
 
   const animate = (time) => {
+    console.log("iz animate funckije");
     if (
       previousTimeRef.current !== undefined &&
       previousTimeRef.current < 4000
     ) {
+      console.log("iz callbacka");
       callback();
     }
     previousTimeRef.current = time;
@@ -25,6 +27,9 @@ const useAnimationFrame = (callback, isSpining = false) => {
 
   useEffect(() => {
     requestRef.current = requestAnimationFrame(animate);
+
     return () => cancelAnimationFrame(requestRef.current);
-  }, []); // Make sure the effect runs only once
+  }, []);
 };
+
+export default useAnimationFrame;
