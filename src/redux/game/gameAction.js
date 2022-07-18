@@ -1,17 +1,10 @@
 import {
-  CHECK_RESULT,
   RESET_GAME,
   BET_ONE,
   BET_MAX,
   REDUCE_CREDIT,
+  SCORE,
 } from "./gameTypes";
-
-export const check = (res) => {
-  return {
-    type: CHECK_RESULT,
-    paylod: res,
-  };
-};
 
 export const resetGame = () => {
   return {
@@ -34,5 +27,12 @@ export const betMax = () => {
 export const reduceCredit = () => {
   return {
     type: REDUCE_CREDIT,
+  };
+};
+
+export const gameScore = (res) => {
+  return {
+    type: SCORE,
+    payload: res,
   };
 };

@@ -1,9 +1,9 @@
 import {
-  CHECK_RESULT,
   RESET_GAME,
   BET_ONE,
   BET_MAX,
   REDUCE_CREDIT,
+  SCORE,
 } from "./gameTypes";
 
 const initialState = {
@@ -37,11 +37,16 @@ const gameReducer = (state = initialState, action) => {
         return {
           ...state,
           credit: state.credit - state.bet,
+          message: "",
         };
       }
     }
-    case CHECK_RESULT: {
-      return state;
+    case SCORE: {
+      return {
+        ...state,
+        winningResult: state.bet * action.payload,
+        message: action.payload === 0 ? "try again!" : "you won!",
+      };
     }
     case RESET_GAME: {
       return initialState;

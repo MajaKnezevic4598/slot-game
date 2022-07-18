@@ -7,6 +7,7 @@ import { betOne } from "../redux/game/gameAction";
 import { betMax } from "../redux/game/gameAction";
 import { resetGame } from "../redux/game/gameAction";
 import { reduceCredit } from "../redux/game/gameAction";
+import { gameScore } from "../redux/game/gameAction";
 
 import { useRef, useEffect, useState, useCallback } from "react";
 
@@ -88,6 +89,7 @@ function Slot() {
   const bet = useSelector((state) => state.bet);
   const credit = useSelector((state) => state.credit);
   const message = useSelector((state) => state.message);
+  const winningResult = useSelector((state) => state.winningResult);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -176,7 +178,7 @@ function Slot() {
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
         ) {
-          first.push(item);
+          first.push(item.id);
           console.log(first);
         }
         setVisibleVertical1(first);
@@ -187,7 +189,7 @@ function Slot() {
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
         ) {
-          second.push(item);
+          second.push(item.id);
         }
         setVisibleVertical2(second);
       });
@@ -197,7 +199,7 @@ function Slot() {
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
         ) {
-          third.push(item);
+          third.push(item.id);
         }
         setVisibleVertical3(third);
       });
@@ -248,15 +250,24 @@ function Slot() {
       console.log(horizontal1);
       console.log(horizontal2);
       console.log(horizontal3);
-
+      let score = 0;
       const findMatchSymobls = (arr) => {
-        if ((arr[0].id === arr[1].id) === arr[2].id) {
+        if (arr[0] === arr[1] && arr[1] === arr[2]) {
           console.log("tri ista");
-        } else if (arr[0].id === arr[1].id || arr[1].id === arr[2].id) {
-          console.log("dva ista");
-        } else {
-          console.log("stani");
+          let result = +arr[0] + +arr[1] + +arr[2];
+
+          score = score + result;
+        } else if (arr[0] === arr[1]) {
+          let result = +arr[0] + +arr[1];
+
+          score = score + result;
+        } else if (arr[1] === arr[2]) {
+          let result = +arr[1] + +arr[2];
+
+          score = score + result;
         }
+        console.log(score);
+        dispatch(gameScore(score));
       };
 
       findMatchSymobls(horizontal1);
@@ -291,6 +302,9 @@ function Slot() {
 
   const disableButton = () => {
     if (bet === "" || started) {
+      return true;
+    }
+    if (credit === 0) {
       return true;
     } else {
       return false;
@@ -387,7 +401,7 @@ function Slot() {
             <p>BET</p>
           </div>
           <div className="winner-paid-cont">
-            <div></div>
+            <div>{winningResult}</div>
             <p>WINNER PAID</p>
           </div>
         </div>
