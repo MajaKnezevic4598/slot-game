@@ -2,6 +2,11 @@ import "./Slot.scss";
 import IMAGES from "../assets/images";
 import music from "../assets/audio/slot3.wav";
 import { v4 as uuidv4 } from "uuid";
+import { useSelector, useDispatch } from "react-redux";
+import { betOne } from "../redux/game/gameAction";
+import { betMax } from "../redux/game/gameAction";
+import { resetGame } from "../redux/game/gameAction";
+import { reduceCredit } from "../redux/game/gameAction";
 
 import { useRef, useEffect, useState, useCallback } from "react";
 
@@ -57,10 +62,17 @@ function Slot() {
   const [reel3, setReel3] = useState([]);
   const [started, setStarted] = useState(false);
 
+  //za disablevoanje dugmeta
+
   //ovde pravimo niz od simbola koji su vidljivi
   const [visibleVertical1, setVisibleVertical1] = useState([]);
   const [visibleVertical2, setVisibleVertical2] = useState([]);
   const [visibleVertical3, setVisibleVertical3] = useState([]);
+
+  //no osnovu ovog onda pravimo horizontalne nizove
+  const [horizontal1, setHorizontal1] = useState([]);
+  const [horizontal2, setHorizontal2] = useState([]);
+  const [horizontal3, setHorizontal3] = useState([]);
 
   const [audio] = useState(new Audio(music));
   const [playing, setPlaying] = useState(false);
@@ -72,6 +84,11 @@ function Slot() {
   //position of conteiner
   const [top, setTop] = useState();
   const [bottom, setBottom] = useState();
+
+  const bet = useSelector((state) => state.bet);
+  const credit = useSelector((state) => state.credit);
+  const message = useSelector((state) => state.message);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setReel1(initShuffleArray([...imageArray]));
@@ -89,7 +106,7 @@ function Slot() {
         audio.currentTime = 0;
       }
     }
-  }, [playing]);
+  }, [playing, audio]);
 
   // const innerSybmolsAfterAnimation = () => {
   //   const firstCol = [];
@@ -137,7 +154,7 @@ function Slot() {
         cancelAnimationFrame(timerId);
       };
     }
-  }, [started, gameState.reelsTopPosition]);
+  }, [started, gameState.reelsTopPosition, animate]);
 
   useEffect(() => {
     console.log(finishedReel1);
@@ -146,45 +163,75 @@ function Slot() {
   }, [finishedReel1, finishedReel2, finishedReel3]);
 
   useEffect(() => {
-    if (top) {
+    if (top && started === false) {
       console.log(top);
       console.log(bottom);
+      let first = [];
+      let second = [];
+      let third = [];
       console.log(typeof finishedReel1);
       finishedReel1.current.forEach((item, index) => {
         console.log(item.getBoundingClientRect().top);
         if (
           item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().top <= bottom
+          item.getBoundingClientRect().bottom <= bottom
         ) {
-          setVisibleVertical1((prev) => {
-            return [...prev, item];
-          });
+          first.push(item);
+          console.log(first);
         }
+        setVisibleVertical1(first);
       });
       finishedReel2.current.forEach((item, index) => {
         console.log(item.getBoundingClientRect().top);
         if (
           item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().top <= bottom
+          item.getBoundingClientRect().bottom <= bottom
         ) {
-          setVisibleVertical2((prev) => {
-            return [...prev, item];
-          });
+          second.push(item);
         }
+        setVisibleVertical2(second);
       });
       finishedReel3.current.forEach((item, index) => {
         console.log(item.getBoundingClientRect().top);
         if (
           item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().top <= bottom
+          item.getBoundingClientRect().bottom <= bottom
         ) {
-          setVisibleVertical3((prev) => {
-            return [...prev, item];
-          });
+          third.push(item);
         }
+        setVisibleVertical3(third);
       });
     }
-  }, [top, bottom]);
+  }, [top, bottom, finishedReel1, finishedReel2, finishedReel3, started]);
+
+  useEffect(() => {
+    if (
+      visibleVertical1.length !== 0 &&
+      visibleVertical2.length !== 0 &&
+      visibleVertical3.length !== 0
+    ) {
+      function makeRows(n1, n2, n3) {
+        let res = [];
+        let mixedArr = [n1, n2, n3];
+        for (let i = 0; i < mixedArr.length; i++) {
+          res.push(mixedArr.map((arr) => arr[i]));
+        }
+
+        let row1 = res.slice(0, 1);
+        let row2 = res.slice(1, 2);
+        let row3 = res.slice(2, 3);
+        setHorizontal1([...row1[0]]);
+        setHorizontal2([...row2[0]]);
+        setHorizontal3([...row3[0]]);
+
+        console.log(row1);
+        console.log(row2);
+        console.log(row3);
+      }
+
+      makeRows(visibleVertical1, visibleVertical2, visibleVertical3);
+    }
+  }, [visibleVertical1, visibleVertical2, visibleVertical3]);
 
   useEffect(() => {
     console.log(visibleVertical1);
@@ -192,16 +239,31 @@ function Slot() {
     console.log(visibleVertical3);
   }, [visibleVertical1, visibleVertical2, visibleVertical3]);
 
-  //moramo da pretrazujemo divove i da pravimo niz izmedju topa i bottoma
+  useEffect(() => {
+    if (
+      horizontal1.length !== 0 &&
+      horizontal2.length !== 0 &&
+      horizontal3 !== 0
+    ) {
+      console.log(horizontal1);
+      console.log(horizontal2);
+      console.log(horizontal3);
 
-  // useEffect(() => {
-  //   console.log(gameState.reelsTopPosition);
-  //   console.log("sada sam drugacija od praznog stringa");
-  // }, [gameState.reelsTopPosition]);
+      const findMatchSymobls = (arr) => {
+        if ((arr[0].id === arr[1].id) === arr[2].id) {
+          console.log("tri ista");
+        } else if (arr[0].id === arr[1].id || arr[1].id === arr[2].id) {
+          console.log("dva ista");
+        } else {
+          console.log("stani");
+        }
+      };
 
-  // useEffect(() => {
-  //   console.log(reelOneRef);
-  // }, [reelOneRef]);
+      findMatchSymobls(horizontal1);
+      findMatchSymobls(horizontal2);
+      findMatchSymobls(horizontal3);
+    }
+  }, [horizontal1, horizontal2, horizontal3]);
 
   useEffect(() => {
     const childRefSet = () => {
@@ -216,25 +278,7 @@ function Slot() {
       }
     };
     setTimeout(childRefSet, 300);
-  }, [reelOneImages]);
-
-  const divsPosition = () => {
-    if (reelOneImages.current.length !== 0) {
-      for (let i = 0; i < reelOneImages.current.length; i++) {
-        let topPosition = reelOneImages.current[i].getBoundingClientRect().top;
-        console.log(i);
-        console.log(topPosition);
-      }
-    }
-  };
-
-  // useEffect(() => {
-  //   setTimeout(divsPosition, 4000);
-  // }, [reelOneImages]);
-
-  // useEffect(() => {
-  //   console.log(gameState);
-  // }, [gameState]);
+  }, [reelOneImages, gameState.numberOfSymbols]);
 
   const resetPos = () => {
     setGameState((state) => {
@@ -245,9 +289,16 @@ function Slot() {
     });
   };
 
+  const disableButton = () => {
+    if (bet === "" || started) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return (
     <div className="slot-conteiner">
-      <h3>Hello from slot!</h3>
       <section className="slot-conteiner__interface" ref={conteinerRef}>
         <div className="column first">
           <div
@@ -324,13 +375,55 @@ function Slot() {
           </div>
         </div>
       </section>
-      <button
-        onClick={() => {
-          setStarted(!started);
-        }}
-      >
-        Spin
-      </button>
+
+      <section className="game-controlls">
+        <div className="betWiner-conteiner">
+          <div className="credit-cont">
+            <div>{credit}</div>
+            <p>CREDIT</p>
+          </div>
+          <div className="bet-cont">
+            <div>{bet}</div>
+            <p>BET</p>
+          </div>
+          <div className="winner-paid-cont">
+            <div></div>
+            <p>WINNER PAID</p>
+          </div>
+        </div>
+        <div className="btn-cont">
+          <div
+            className="reset"
+            onClick={() => {
+              dispatch(resetGame());
+            }}
+          >
+            reset
+          </div>
+          <div
+            className="bet-one"
+            onClick={() => {
+              dispatch(betOne());
+            }}
+          >
+            BET ONE
+          </div>
+          <div className="bet-max" onClick={() => dispatch(betMax())}>
+            BET MAX
+          </div>
+          <button
+            className="spin-btn"
+            onClick={() => {
+              setStarted(!started);
+              dispatch(reduceCredit());
+            }}
+            disabled={disableButton()}
+          >
+            Spin
+          </button>
+        </div>
+      </section>
+      <section className="game-message">{message}</section>
     </div>
   );
 }

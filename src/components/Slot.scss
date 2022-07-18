@@ -8,30 +8,30 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 5vh 0;
+  background-color: darkcyan;
 
   &__interface {
     margin-top: 5vh;
     @include mediaQuery($desktop-large-width) {
-      width: 3 * $slot-icon-width-large-desktop;
-      height: 3 * $slot-icon-width-large-desktop;
+      width: 3 * $slot-icon-width-large-desktop + 5;
+      height: 3 * $slot-icon-width-large-desktop + 5;
     }
     @include mediaQuery($desktop-width) {
-      width: 3 * $slot-icon-width-desktop;
-      height: 3 * $slot-icon-width-desktop;
+      width: 3 * $slot-icon-width-desktop + 5;
+      height: 3 * $slot-icon-width-desktop + 5;
     }
     @include mediaQuery($tablet-width) {
-      width: 3 * $slot-icon-width-tablet;
-      height: 3 * $slot-icon-width-tablet;
+      width: 3 * $slot-icon-width-tablet + 5;
+      height: 3 * $slot-icon-width-tablet + 5;
     }
     @include mediaQuery($mobile-width) {
-      width: 3 * $slot-icon-width-mobile;
-      height: 3 * $slot-icon-width-mobile;
+      width: 3 * $slot-icon-width-mobile + 5;
+      height: 3 * $slot-icon-width-mobile + 5;
     }
 
     border: 1px solid black;
     display: flex;
-    // overflow: hidden;
+    overflow: hidden;
     background-color: $dark-gray;
 
     .column {
@@ -95,6 +95,128 @@
           object-fit: contain;
           border: 1px solid black;
         }
+      }
+    }
+  }
+  .game-controlls {
+    background-color: $dark-gray;
+
+    @include mediaQuery($desktop-large-width) {
+      width: 3 * $slot-icon-width-large-desktop + 5;
+    }
+    @include mediaQuery($desktop-width) {
+      width: 3 * $slot-icon-width-desktop + 5;
+    }
+    @include mediaQuery($tablet-width) {
+      width: 3 * $slot-icon-width-tablet + 5;
+    }
+    @include mediaQuery($mobile-width) {
+      width: 3 * $slot-icon-width-mobile + 5;
+    }
+
+    .betWiner-conteiner {
+      width: 100%;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      border: 1px solid white;
+
+      .bet-cont,
+      .credit-cont {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid red;
+        align-items: center;
+      }
+      .credit-cont {
+        margin-left: 1vw;
+        margin-right: auto;
+      }
+      .bet-cont > div,
+      .credit-cont > div {
+        height: 8vh;
+        width: 8vh;
+        border: 2px solid white;
+        border-radius: 2px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1vh;
+        color: white;
+        font-size: 18px;
+      }
+      .bet-cont > p,
+      .winner-paid-cont > p,
+      .credit-cont > p {
+        font-size: 13px;
+        color: white;
+        font-weight: bold;
+        letter-spacing: 0.1vw;
+      }
+      .winner-paid-cont {
+        display: flex;
+        flex-direction: column;
+        border: 1px solid red;
+        align-items: center;
+        margin-right: 1vw;
+        margin-left: 1vw;
+      }
+      .winner-paid-cont > div {
+        width: 15vh;
+        height: 8vh;
+        border: 2px solid white;
+        border-radius: 2px;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1vh;
+      }
+    }
+
+    .btn-cont {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 0.5rem;
+
+      .bet-one,
+      .bet-max {
+        width: 8vh;
+        height: 8vh;
+        background-color: red;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        border-radius: 4px;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .bet-max {
+        margin-left: 2vw;
+      }
+
+      .spin-btn {
+        padding: 1rem;
+        background-color: greenyellow;
+        margin-right: 1vw;
+        margin-left: 3vw;
+        border: 2px solid darkgreen;
+        border-radius: 4px;
+        font-family: $roboto-font-mono;
+        font-size: 14px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .reset {
+        color: white;
+        padding: 0.5rem;
+        border: 2px solid #eee;
+        border-radius: 2px;
+        cursor: pointer;
+        margin-right: 3vw;
       }
     }
   }
