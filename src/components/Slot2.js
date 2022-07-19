@@ -9,7 +9,13 @@ import { resetGame } from "../redux/game/gameAction";
 import { reduceCredit } from "../redux/game/gameAction";
 import { gameScore } from "../redux/game/gameAction";
 
-import { useRef, useEffect, useState, useCallback } from "react";
+import {
+  useRef,
+  useEffect,
+  useState,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 
 function Slot() {
   //imacemo 2 puta 12 symbola tj 24
@@ -88,7 +94,6 @@ function Slot() {
   const credit = useSelector((state) => state.credit);
   const message = useSelector((state) => state.message);
   const winningResult = useSelector((state) => state.winningResult);
-  const canSpin = useSelector((state) => state.canSpin);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -117,13 +122,13 @@ function Slot() {
     }
   }, [playing, audio]);
 
-  const innerSybmolsAfterAnimation = () => {
-    const firstCol = [];
-    if (reelOneRef !== null) {
-      console.log(reelOneRef);
-      console.log("ovo je posle kada se zavrsi vrtenje");
-    }
-  };
+  // const innerSybmolsAfterAnimation = () => {
+  //   const firstCol = [];
+  //   if (reelOneRef !== null) {
+  //     console.log(reelOneRef);
+  //     console.log("ovo je posle kada se zavrsi vrtenje");
+  //   }
+  // };
 
   const animate = useCallback(() => {
     const resetPosition =
@@ -163,7 +168,7 @@ function Slot() {
         cancelAnimationFrame(timerId);
       };
     }
-  }, [started, gameState.reelsTopPosition]);
+  }, [started, gameState.reelsTopPosition, animate]);
 
   useEffect(() => {
     console.log(finishedReel1);
@@ -214,11 +219,6 @@ function Slot() {
   }, [top, bottom, finishedReel1, finishedReel2, finishedReel3, started]);
 
   useEffect(() => {
-    console.log(visibleVertical1);
-    console.log(visibleVertical2);
-    console.log(visibleVertical3);
-  }, [visibleVertical1, visibleVertical2, visibleVertical3]);
-  useEffect(() => {
     if (
       visibleVertical1.length !== 0 &&
       visibleVertical2.length !== 0 &&
@@ -227,17 +227,13 @@ function Slot() {
       function makeRows(n1, n2, n3) {
         let res = [];
         let mixedArr = [n1, n2, n3];
-        console.log(mixedArr);
         for (let i = 0; i < mixedArr.length; i++) {
           res.push(mixedArr.map((arr) => arr[i]));
         }
-        console.log(res);
+
         let row1 = res.slice(0, 1);
         let row2 = res.slice(1, 2);
         let row3 = res.slice(2, 3);
-        console.log(row1);
-        console.log(row2);
-        console.log(row3);
         setHorizontal1([...row1[0]]);
         setHorizontal2([...row2[0]]);
         setHorizontal3([...row3[0]]);
@@ -269,6 +265,7 @@ function Slot() {
       let score = 0;
       const findMatchSymobls = (arr) => {
         if (arr[0] === arr[1] && arr[1] === arr[2]) {
+          console.log("tri ista");
           let result = +arr[0] + +arr[1] + +arr[2];
 
           score = score + result;
@@ -281,7 +278,7 @@ function Slot() {
 
           score = score + result;
         }
-
+        console.log(score);
         dispatch(gameScore(score));
       };
 
@@ -327,12 +324,16 @@ function Slot() {
     if (bet === "" || started) {
       return true;
     }
-    if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
+    if (credit === 0) {
       return true;
     } else {
       return false;
     }
   };
+
+  useEffect(() => {
+    console.log(reelOneRef);
+  }, [reelOneRef]);
 
   return (
     <div className="slot-conteiner">
@@ -351,13 +352,12 @@ function Slot() {
           >
             {reel1.map((item, index) => {
               return (
-                <div key={uuidv4()}>
-                  <img
-                    src={item.src}
-                    alt=""
-                    ref={(element) => (reelOneImages.current[index] = element)}
-                    id={item.value}
-                  />
+                <div
+                  key={uuidv4()}
+                  ref={(element) => (reelOneImages.current[index] = element)}
+                  id={item.value}
+                >
+                  <img src={item.src} alt="" />
                 </div>
               );
             })}
@@ -377,13 +377,12 @@ function Slot() {
             {" "}
             {reel2.map((item, index) => {
               return (
-                <div key={uuidv4()}>
-                  <img
-                    src={item.src}
-                    alt=""
-                    ref={(element) => (reelTwoImages.current[index] = element)}
-                    id={item.value}
-                  />
+                <div
+                  key={uuidv4()}
+                  ref={(element) => (reelTwoImages.current[index] = element)}
+                  id={item.value}
+                >
+                  <img src={item.src} alt="" />
                 </div>
               );
             })}
@@ -402,15 +401,12 @@ function Slot() {
           >
             {reel3.map((item, index) => {
               return (
-                <div key={uuidv4()}>
-                  <img
-                    src={item.src}
-                    alt=""
-                    ref={(element) =>
-                      (reelThreeImages.current[index] = element)
-                    }
-                    id={item.value}
-                  />
+                <div
+                  key={uuidv4()}
+                  ref={(element) => (reelThreeImages.current[index] = element)}
+                  id={item.value}
+                >
+                  <img src={item.src} alt="" />
                 </div>
               );
             })}
@@ -420,15 +416,13 @@ function Slot() {
 
       <section className="game-controlls">
         <div className="betWiner-conteiner">
-          <div className="credit-bet-cont">
-            <div className="credit-cont">
-              <div>{credit}</div>
-              <p>CREDIT</p>
-            </div>
-            <div className="bet-cont">
-              <div>{bet}</div>
-              <p>BET</p>
-            </div>
+          <div className="credit-cont">
+            <div>{credit}</div>
+            <p>CREDIT</p>
+          </div>
+          <div className="bet-cont">
+            <div>{bet}</div>
+            <p>BET</p>
           </div>
           <div className="winner-paid-cont">
             <div>{winningResult}</div>
@@ -444,18 +438,16 @@ function Slot() {
           >
             reset
           </div>
-          <div className="bet-one-bet-max">
-            <div
-              className="bet-one"
-              onClick={() => {
-                dispatch(betOne());
-              }}
-            >
-              BET ONE
-            </div>
-            <div className="bet-max" onClick={() => dispatch(betMax())}>
-              BET MAX
-            </div>
+          <div
+            className="bet-one"
+            onClick={() => {
+              dispatch(betOne());
+            }}
+          >
+            BET ONE
+          </div>
+          <div className="bet-max" onClick={() => dispatch(betMax())}>
+            BET MAX
           </div>
           <button
             className="spin-btn"
@@ -469,14 +461,7 @@ function Slot() {
           </button>
         </div>
       </section>
-      <section className="game-message">
-        <div>{message}</div>
-        <div>
-          {credit - bet === -1 || credit - bet < 0
-            ? "Last turn, reset and make your bet!"
-            : null}
-        </div>
-      </section>
+      <section className="game-message">{message}</section>
     </div>
   );
 }

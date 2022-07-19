@@ -9,7 +9,7 @@ import {
 const initialState = {
   bet: "",
   winningResult: 0,
-  credit: 20,
+  credit: 5,
   message: "",
 };
 
@@ -28,24 +28,17 @@ const gameReducer = (state = initialState, action) => {
       };
     }
     case REDUCE_CREDIT: {
-      if (state.credit - state.bet < 0) {
-        return {
-          ...state,
-          message: "you don`t have enought credit",
-        };
-      } else {
-        return {
-          ...state,
-          credit: state.credit - state.bet,
-          message: "",
-        };
-      }
+      return {
+        ...state,
+        credit: state.credit - state.bet,
+        message: "",
+      };
     }
     case SCORE: {
       return {
         ...state,
         winningResult: state.bet * action.payload,
-        message: action.payload === 0 ? "try again!" : "you won!",
+        message: action.payload === 0 ? "Try again!" : "You won!",
       };
     }
     case RESET_GAME: {
