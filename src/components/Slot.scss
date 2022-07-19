@@ -248,6 +248,10 @@
         font-size: 18px;
         font-weight: bold;
         cursor: pointer;
+        &:disabled {
+          background-color: gray;
+          cursor: not-allowed;
+        }
         @include mediaQuery($mobile-width) {
           height: 6vh;
           width: 10vh;
