@@ -62,6 +62,7 @@ function Slot() {
   const [reel2, setReel2] = useState([]);
   const [reel3, setReel3] = useState([]);
   const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
 
   //ovde pravimo niz od simbola koji su vidljivi
   const [visibleVertical1, setVisibleVertical1] = useState([]);
@@ -88,7 +89,7 @@ function Slot() {
   const credit = useSelector((state) => state.credit);
   const message = useSelector((state) => state.message);
   const winningResult = useSelector((state) => state.winningResult);
-  const canSpin = useSelector((state) => state.canSpin);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -117,14 +118,6 @@ function Slot() {
     }
   }, [playing, audio]);
 
-  const innerSybmolsAfterAnimation = () => {
-    const firstCol = [];
-    if (reelOneRef !== null) {
-      console.log(reelOneRef);
-      console.log("ovo je posle kada se zavrsi vrtenje");
-    }
-  };
-
   const animate = useCallback(() => {
     const resetPosition =
       (gameState.numberOfSymbols / 2 - 3) * gameState.symbolHeight;
@@ -145,24 +138,27 @@ function Slot() {
   ]);
 
   useEffect(() => {
+    let timerId;
     if (started) {
-      let timerId;
       timerId = requestAnimationFrame(animate);
       setPlaying(true);
+      setFinished(false);
+
       setTimeout(() => {
         setStarted(false);
         setPlaying(false);
-        setFinishedReel1(reelOneImages);
-        setFinishedReel2(reelTwoImages);
-        setFinishedReel3(reelThreeImages);
-        setTop(conteinerRef.current.getBoundingClientRect().top);
-        setBottom(conteinerRef.current.getBoundingClientRect().bottom);
       }, 3000);
 
-      return () => {
-        cancelAnimationFrame(timerId);
-      };
+      setFinishedReel1(reelOneImages);
+      setFinishedReel2(reelTwoImages);
+      setFinishedReel3(reelThreeImages);
+      setTop(conteinerRef.current.getBoundingClientRect().top);
+      setBottom(conteinerRef.current.getBoundingClientRect().bottom);
     }
+
+    return () => {
+      cancelAnimationFrame(timerId);
+    };
   }, [started, gameState.reelsTopPosition]);
 
   useEffect(() => {
@@ -266,6 +262,8 @@ function Slot() {
       console.log(horizontal1);
       console.log(horizontal2);
       console.log(horizontal3);
+      console.log("kraj rendiranja");
+      setFinished(true);
       let score = 0;
       const findMatchSymobls = (arr) => {
         if (arr[0] === arr[1] && arr[1] === arr[2]) {
@@ -328,6 +326,9 @@ function Slot() {
       return true;
     }
     if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
+      return true;
+    }
+    if (started === false && finished === false) {
       return true;
     } else {
       return false;
