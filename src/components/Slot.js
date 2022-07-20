@@ -262,8 +262,11 @@ function Slot() {
       console.log(horizontal1);
       console.log(horizontal2);
       console.log(horizontal3);
-      console.log("kraj rendiranja");
-      setFinished(true);
+
+      // setTimeout(() => {
+      //   setFinished(true);
+      // }, 1000);
+
       let score = 0;
       const findMatchSymobls = (arr) => {
         if (arr[0] === arr[1] && arr[1] === arr[2]) {
@@ -286,6 +289,11 @@ function Slot() {
       findMatchSymobls(horizontal1);
       findMatchSymobls(horizontal2);
       findMatchSymobls(horizontal3);
+      setTimeout(() => {
+        setFinished(true);
+      }, 1200);
+
+      console.log("kraj rendiranja");
     }
   }, [horizontal1, horizontal2, horizontal3]);
 
@@ -328,7 +336,7 @@ function Slot() {
     if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
       return true;
     }
-    if (started === false && finished === false) {
+    if (finished === false) {
       return true;
     } else {
       return false;
