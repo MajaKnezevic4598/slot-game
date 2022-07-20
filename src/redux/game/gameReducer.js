@@ -9,7 +9,7 @@ import {
 const initialState = {
   bet: "",
   winningResult: 0,
-  credit: 5,
+  credit: 10,
   message: "",
 };
 

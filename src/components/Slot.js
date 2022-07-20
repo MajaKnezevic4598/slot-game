@@ -141,14 +141,10 @@ function Slot() {
 
   useEffect(() => {
     let timerId;
+
     if (started) {
       timerId = requestAnimationFrame(animate);
       setPlaying(true);
-
-      setTimeout(() => {
-        setStarted(false);
-        setPlaying(false);
-      }, 3000);
 
       setFinishedReel1(reelOneImages);
       setFinishedReel2(reelTwoImages);
@@ -160,7 +156,21 @@ function Slot() {
     return () => {
       cancelAnimationFrame(timerId);
     };
-  }, [started, gameState.reelsTopPosition]);
+  }, [started, gameState.reelsTopPosition, animate]);
+
+  useEffect(() => {
+    let setTimeID;
+    if (started) {
+      setTimeID = setTimeout(() => {
+        setStarted(false);
+        setPlaying(false);
+      }, 3000);
+    }
+
+    return () => {
+      clearTimeout(setTimeID);
+    };
+  }, [started]);
 
   useEffect(() => {
     console.log(finishedReel1);
@@ -171,13 +181,16 @@ function Slot() {
   useEffect(() => {
     if (top && started === false) {
       console.log(top);
+      console.log("toooooooooooooooooooooooooooooooop");
       console.log(bottom);
+      console.log("booooootttom");
       let first = [];
       let second = [];
       let third = [];
-      console.log(typeof finishedReel1);
+
       finishedReel1.current.forEach((item, index) => {
         console.log(item.getBoundingClientRect().top);
+        // console.log(item.getBoundingClientRect().bottom);
         if (
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
@@ -188,7 +201,7 @@ function Slot() {
         setVisibleVertical1(first);
       });
       finishedReel2.current.forEach((item, index) => {
-        console.log(item.getBoundingClientRect().top);
+        // console.log(item.getBoundingClientRect().top);
         if (
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
@@ -198,7 +211,7 @@ function Slot() {
         setVisibleVertical2(second);
       });
       finishedReel3.current.forEach((item, index) => {
-        console.log(item.getBoundingClientRect().top);
+        // console.log(item.getBoundingClientRect().top);
         if (
           item.getBoundingClientRect().top >= top &&
           item.getBoundingClientRect().bottom <= bottom
@@ -312,9 +325,9 @@ function Slot() {
     });
   };
 
-  useEffect(() => {
-    console.log(gameState);
-  }, [gameState]);
+  // useEffect(() => {
+  //   console.log(gameState);
+  // }, [gameState]);
 
   const disableButton = () => {
     if (bet === "" || started) {

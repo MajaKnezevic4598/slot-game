@@ -62,6 +62,9 @@ function Slot() {
   const [reel2, setReel2] = useState([]);
   const [reel3, setReel3] = useState([]);
   const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+
+  const [disabled, setDisabled] = useState(false);
 
   //ovde pravimo niz od simbola koji su vidljivi
   const [visibleVertical1, setVisibleVertical1] = useState([]);
@@ -88,7 +91,7 @@ function Slot() {
   const credit = useSelector((state) => state.credit);
   const message = useSelector((state) => state.message);
   const winningResult = useSelector((state) => state.winningResult);
-  const canSpin = useSelector((state) => state.canSpin);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -117,16 +120,7 @@ function Slot() {
     }
   }, [playing, audio]);
 
-  const innerSybmolsAfterAnimation = () => {
-    const firstCol = [];
-    if (reelOneRef !== null) {
-      console.log(reelOneRef);
-      console.log("ovo je posle kada se zavrsi vrtenje");
-    }
-  };
-
   const animate = useCallback(() => {
-    setPlaying(true);
     const resetPosition =
       (gameState.numberOfSymbols / 2 - 3) * gameState.symbolHeight;
 
@@ -139,8 +133,6 @@ function Slot() {
     if (gameState.reelsTopPosition <= resetPosition) {
       resetPos();
     }
-
-    requestAnimationFrame(animate);
   }, [
     gameState.reelsTopPosition,
     gameState.symbolHeight,
@@ -149,15 +141,14 @@ function Slot() {
 
   useEffect(() => {
     let timerId;
+
     if (started) {
       timerId = requestAnimationFrame(animate);
       setPlaying(true);
 
-      setTimeout(() => {
-        setStarted(false);
-        setPlaying(false);
-      }, 3000);
-
+      setFinishedReel1(reelOneImages);
+      setFinishedReel2(reelTwoImages);
+      setFinishedReel3(reelThreeImages);
       setTop(conteinerRef.current.getBoundingClientRect().top);
       setBottom(conteinerRef.current.getBoundingClientRect().bottom);
     }
@@ -165,7 +156,21 @@ function Slot() {
     return () => {
       cancelAnimationFrame(timerId);
     };
-  }, [started, gameState.reelsTopPosition]);
+  }, [started, gameState.reelsTopPosition, animate]);
+
+  useEffect(() => {
+    let setTimeID;
+    if (started) {
+      setTimeID = setTimeout(() => {
+        setStarted(false);
+        setPlaying(false);
+      }, 3000);
+    }
+
+    return () => {
+      clearTimeout(setTimeID);
+    };
+  }, [started]);
 
   useEffect(() => {
     console.log(finishedReel1);
@@ -254,12 +259,6 @@ function Slot() {
   }, [visibleVertical1, visibleVertical2, visibleVertical3]);
 
   useEffect(() => {
-    console.log(visibleVertical1);
-    console.log(visibleVertical2);
-    console.log(visibleVertical3);
-  }, [visibleVertical1, visibleVertical2, visibleVertical3]);
-
-  useEffect(() => {
     if (
       horizontal1.length !== 0 &&
       horizontal2.length !== 0 &&
@@ -268,6 +267,7 @@ function Slot() {
       console.log(horizontal1);
       console.log(horizontal2);
       console.log(horizontal3);
+
       let score = 0;
       const findMatchSymobls = (arr) => {
         if (arr[0] === arr[1] && arr[1] === arr[2]) {
@@ -290,6 +290,11 @@ function Slot() {
       findMatchSymobls(horizontal1);
       findMatchSymobls(horizontal2);
       findMatchSymobls(horizontal3);
+      setTimeout(() => {
+        setFinished(true);
+      }, 1200);
+
+      console.log("kraj rendiranja");
     }
   }, [horizontal1, horizontal2, horizontal3]);
 
@@ -308,13 +313,6 @@ function Slot() {
     setTimeout(childRefSet, 2000);
   }, [reelOneRef]);
 
-  useEffect(() => {
-    console.log(reelOneImages);
-    setFinishedReel1(reelOneImages);
-    setFinishedReel2(reelTwoImages);
-    setFinishedReel3(reelThreeImages);
-  }, [reelOneImages, reelTwoImages, reelThreeImages]);
-
   const resetPos = () => {
     setGameState((state) => {
       return {
@@ -332,6 +330,7 @@ function Slot() {
     if (bet === "" || started) {
       return true;
     }
+
     if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
       return true;
     } else {
@@ -466,6 +465,7 @@ function Slot() {
             className="spin-btn"
             onClick={() => {
               setStarted(!started);
+              setFinished(false);
               dispatch(reduceCredit());
             }}
             disabled={disableButton()}
