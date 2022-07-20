@@ -336,7 +336,10 @@ function Slot() {
     if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
       return true;
     }
-    if (finished === false) {
+    if (finished === false && started === true) {
+      return true;
+    }
+    if (finished === false || started === true) {
       return true;
     } else {
       return false;
