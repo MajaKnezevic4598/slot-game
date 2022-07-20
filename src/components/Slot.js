@@ -64,6 +64,8 @@ function Slot() {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
 
+  const [disabled, setDisabled] = useState(false);
+
   //ovde pravimo niz od simbola koji su vidljivi
   const [visibleVertical1, setVisibleVertical1] = useState([]);
   const [visibleVertical2, setVisibleVertical2] = useState([]);
@@ -142,7 +144,6 @@ function Slot() {
     if (started) {
       timerId = requestAnimationFrame(animate);
       setPlaying(true);
-      setFinished(false);
 
       setTimeout(() => {
         setStarted(false);
@@ -248,12 +249,6 @@ function Slot() {
   }, [visibleVertical1, visibleVertical2, visibleVertical3]);
 
   useEffect(() => {
-    console.log(visibleVertical1);
-    console.log(visibleVertical2);
-    console.log(visibleVertical3);
-  }, [visibleVertical1, visibleVertical2, visibleVertical3]);
-
-  useEffect(() => {
     if (
       horizontal1.length !== 0 &&
       horizontal2.length !== 0 &&
@@ -262,10 +257,6 @@ function Slot() {
       console.log(horizontal1);
       console.log(horizontal2);
       console.log(horizontal3);
-
-      // setTimeout(() => {
-      //   setFinished(true);
-      // }, 1000);
 
       let score = 0;
       const findMatchSymobls = (arr) => {
@@ -312,10 +303,6 @@ function Slot() {
     setTimeout(childRefSet, 2000);
   }, [reelOneRef]);
 
-  useEffect(() => {
-    console.log(reelOneImages);
-  }, [reelOneImages]);
-
   const resetPos = () => {
     setGameState((state) => {
       return {
@@ -333,13 +320,8 @@ function Slot() {
     if (bet === "" || started) {
       return true;
     }
+
     if (credit - bet === -1 || credit - bet === -3 || credit - bet < 0) {
-      return true;
-    }
-    if (finished === false && started === true) {
-      return true;
-    }
-    if (finished === false || started === true) {
       return true;
     } else {
       return false;
@@ -473,6 +455,7 @@ function Slot() {
             className="spin-btn"
             onClick={() => {
               setStarted(!started);
+              setFinished(false);
               dispatch(reduceCredit());
             }}
             disabled={disableButton()}
