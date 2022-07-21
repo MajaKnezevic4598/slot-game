@@ -12,7 +12,7 @@ import { gameScore } from "../redux/game/gameAction";
 import { useRef, useEffect, useState, useCallback } from "react";
 
 function Slot() {
-  //imacemo 2 puta 12 symbola tj 24
+  //number of symbols = 2*12
   const NUMBER_OF_SYMBOLS = 24;
   const initialState = {
     numberOfSymbols: NUMBER_OF_SYMBOLS,
@@ -48,8 +48,6 @@ function Slot() {
     return [...arr, ...arr];
   }
 
-  //ovde moramo da imamo dva puta isti raspored u nizu zbog animacije
-
   const conteinerRef = useRef(null);
   const reelOneRef = useRef(null);
 
@@ -62,16 +60,13 @@ function Slot() {
   const [reel2, setReel2] = useState([]);
   const [reel3, setReel3] = useState([]);
   const [started, setStarted] = useState(false);
-  const [finished, setFinished] = useState(false);
 
-  const [disabled, setDisabled] = useState(false);
-
-  //ovde pravimo niz od simbola koji su vidljivi
+  //visible vertical part of the array
   const [visibleVertical1, setVisibleVertical1] = useState([]);
   const [visibleVertical2, setVisibleVertical2] = useState([]);
   const [visibleVertical3, setVisibleVertical3] = useState([]);
 
-  //no osnovu ovog onda pravimo horizontalne nizove
+  //horizontal rows
   const [horizontal1, setHorizontal1] = useState([]);
   const [horizontal2, setHorizontal2] = useState([]);
   const [horizontal3, setHorizontal3] = useState([]);
@@ -83,7 +78,7 @@ function Slot() {
   const [finishedReel2, setFinishedReel2] = useState([]);
   const [finishedReel3, setFinishedReel3] = useState([]);
 
-  //position of conteiner
+  //position of the slot conteiner
   const [top, setTop] = useState();
   const [bottom, setBottom] = useState();
 
@@ -94,12 +89,14 @@ function Slot() {
 
   const dispatch = useDispatch();
 
+  //setting reels on first render
   useEffect(() => {
     setReel1(initShuffleArray([...imageArray]));
     setReel2(initShuffleArray([...imageArray]));
     setReel3(initShuffleArray([...imageArray]));
   }, []);
 
+  //setting reels every time we start the game
   useEffect(() => {
     if (started) {
       setReel1(initShuffleArray([...imageArray]));
@@ -108,6 +105,19 @@ function Slot() {
     }
   }, [started]);
 
+  useEffect(() => {
+    const childRefSet = () => {
+      const symbolHeight = reelOneRef.current.children[0].offsetHeight;
+      const reelsTopPosition = (gameState.numberOfSymbols - 3) * symbolHeight;
+      const delta = symbolHeight;
+      setGameState((prev) => {
+        return { ...prev, symbolHeight, reelsTopPosition, delta };
+      });
+    };
+    setTimeout(childRefSet, 2000);
+  }, [reelOneRef]);
+
+  //audio
   useEffect(() => {
     if (playing) {
       audio.play();
@@ -119,6 +129,16 @@ function Slot() {
       }
     }
   }, [playing, audio]);
+
+  //reset postion to initial position
+  const resetPos = () => {
+    setGameState((state) => {
+      return {
+        ...state,
+        reelsTopPosition: (state.numberOfSymbols - 3) * state.symbolHeight,
+      };
+    });
+  };
 
   const animate = useCallback(() => {
     const resetPosition =
@@ -141,11 +161,9 @@ function Slot() {
 
   useEffect(() => {
     let timerId;
-
     if (started) {
       timerId = requestAnimationFrame(animate);
       setPlaying(true);
-
       setFinishedReel1(reelOneImages);
       setFinishedReel2(reelTwoImages);
       setFinishedReel3(reelThreeImages);
@@ -172,35 +190,21 @@ function Slot() {
     };
   }, [started]);
 
-  useEffect(() => {
-    console.log(finishedReel1);
-    console.log(finishedReel2);
-    console.log(finishedReel3);
-  }, [finishedReel1, finishedReel2, finishedReel3]);
-
   let position = () => {
-    console.log(top);
-    console.log("toooooooooooooooooooooooooooooooop");
-    console.log(bottom);
-    console.log("booooootttom");
     let first = [];
     let second = [];
     let third = [];
 
     finishedReel1.current.forEach((item, index) => {
-      console.log(item.getBoundingClientRect().top);
-      // console.log(item.getBoundingClientRect().bottom);
       if (
         item.getBoundingClientRect().top >= top &&
         item.getBoundingClientRect().bottom <= bottom
       ) {
         first.push(item.id);
-        console.log(first);
       }
       setVisibleVertical1(first);
     });
     finishedReel2.current.forEach((item, index) => {
-      // console.log(item.getBoundingClientRect().top);
       if (
         item.getBoundingClientRect().top >= top &&
         item.getBoundingClientRect().bottom <= bottom
@@ -210,7 +214,6 @@ function Slot() {
       setVisibleVertical2(second);
     });
     finishedReel3.current.forEach((item, index) => {
-      // console.log(item.getBoundingClientRect().top);
       if (
         item.getBoundingClientRect().top >= top &&
         item.getBoundingClientRect().bottom <= bottom
@@ -234,11 +237,6 @@ function Slot() {
   }, [top, bottom, finishedReel1, finishedReel2, finishedReel3, started]);
 
   useEffect(() => {
-    console.log(visibleVertical1);
-    console.log(visibleVertical2);
-    console.log(visibleVertical3);
-  }, [visibleVertical1, visibleVertical2, visibleVertical3]);
-  useEffect(() => {
     if (
       visibleVertical1.length !== 0 &&
       visibleVertical2.length !== 0 &&
@@ -247,24 +245,18 @@ function Slot() {
       function makeRows(n1, n2, n3) {
         let res = [];
         let mixedArr = [n1, n2, n3];
-        console.log(mixedArr);
+
         for (let i = 0; i < mixedArr.length; i++) {
           res.push(mixedArr.map((arr) => arr[i]));
         }
-        console.log(res);
+
         let row1 = res.slice(0, 1);
         let row2 = res.slice(1, 2);
         let row3 = res.slice(2, 3);
-        console.log(row1);
-        console.log(row2);
-        console.log(row3);
+
         setHorizontal1([...row1[0]]);
         setHorizontal2([...row2[0]]);
         setHorizontal3([...row3[0]]);
-
-        console.log(row1);
-        console.log(row2);
-        console.log(row3);
       }
 
       makeRows(visibleVertical1, visibleVertical2, visibleVertical3);
@@ -277,10 +269,6 @@ function Slot() {
       horizontal2.length !== 0 &&
       horizontal3 !== 0
     ) {
-      console.log(horizontal1);
-      console.log(horizontal2);
-      console.log(horizontal3);
-
       let score = 0;
       const findMatchSymobls = (arr) => {
         if (arr[0] === arr[1] && arr[1] === arr[2]) {
@@ -303,41 +291,8 @@ function Slot() {
       findMatchSymobls(horizontal1);
       findMatchSymobls(horizontal2);
       findMatchSymobls(horizontal3);
-      setTimeout(() => {
-        setFinished(true);
-      }, 1200);
-
-      console.log("kraj rendiranja");
     }
-  }, [horizontal1, horizontal2, horizontal3]);
-
-  useEffect(() => {
-    const childRefSet = () => {
-      console.log(reelOneRef);
-
-      const symbolHeight = reelOneRef.current.children[0].offsetHeight;
-      const reelsTopPosition = (gameState.numberOfSymbols - 3) * symbolHeight;
-      const delta = symbolHeight;
-      //   stavili smo da nam delta bude symbolHeight kako bi animacija uvek poravnavala simbole
-      setGameState((prev) => {
-        return { ...prev, symbolHeight, reelsTopPosition, delta };
-      });
-    };
-    setTimeout(childRefSet, 2000);
-  }, [reelOneRef]);
-
-  const resetPos = () => {
-    setGameState((state) => {
-      return {
-        ...state,
-        reelsTopPosition: (state.numberOfSymbols - 3) * state.symbolHeight,
-      };
-    });
-  };
-
-  // useEffect(() => {
-  //   console.log(gameState);
-  // }, [gameState]);
+  }, [horizontal1, horizontal2, horizontal3, dispatch]);
 
   const disableButton = () => {
     if (bet === "" || started) {
@@ -478,7 +433,7 @@ function Slot() {
             className="spin-btn"
             onClick={() => {
               setStarted(!started);
-              setFinished(false);
+
               dispatch(reduceCredit());
             }}
             disabled={disableButton()}
