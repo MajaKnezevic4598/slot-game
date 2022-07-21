@@ -14,9 +14,9 @@ function App() {
     <>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <Slot />
+          {/* <Slot /> */}
 
-          {/* <Slot2 /> */}
+          <Slot2 />
         </PersistGate>
       </Provider>
     </>

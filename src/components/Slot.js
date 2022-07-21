@@ -178,49 +178,59 @@ function Slot() {
     console.log(finishedReel3);
   }, [finishedReel1, finishedReel2, finishedReel3]);
 
-  useEffect(() => {
-    if (top && started === false) {
-      console.log(top);
-      console.log("toooooooooooooooooooooooooooooooop");
-      console.log(bottom);
-      console.log("booooootttom");
-      let first = [];
-      let second = [];
-      let third = [];
+  let position = () => {
+    console.log(top);
+    console.log("toooooooooooooooooooooooooooooooop");
+    console.log(bottom);
+    console.log("booooootttom");
+    let first = [];
+    let second = [];
+    let third = [];
 
-      finishedReel1.current.forEach((item, index) => {
-        console.log(item.getBoundingClientRect().top);
-        // console.log(item.getBoundingClientRect().bottom);
-        if (
-          item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().bottom <= bottom
-        ) {
-          first.push(item.id);
-          console.log(first);
-        }
-        setVisibleVertical1(first);
-      });
-      finishedReel2.current.forEach((item, index) => {
-        // console.log(item.getBoundingClientRect().top);
-        if (
-          item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().bottom <= bottom
-        ) {
-          second.push(item.id);
-        }
-        setVisibleVertical2(second);
-      });
-      finishedReel3.current.forEach((item, index) => {
-        // console.log(item.getBoundingClientRect().top);
-        if (
-          item.getBoundingClientRect().top >= top &&
-          item.getBoundingClientRect().bottom <= bottom
-        ) {
-          third.push(item.id);
-        }
-        setVisibleVertical3(third);
-      });
+    finishedReel1.current.forEach((item, index) => {
+      console.log(item.getBoundingClientRect().top);
+      // console.log(item.getBoundingClientRect().bottom);
+      if (
+        item.getBoundingClientRect().top >= top &&
+        item.getBoundingClientRect().bottom <= bottom
+      ) {
+        first.push(item.id);
+        console.log(first);
+      }
+      setVisibleVertical1(first);
+    });
+    finishedReel2.current.forEach((item, index) => {
+      // console.log(item.getBoundingClientRect().top);
+      if (
+        item.getBoundingClientRect().top >= top &&
+        item.getBoundingClientRect().bottom <= bottom
+      ) {
+        second.push(item.id);
+      }
+      setVisibleVertical2(second);
+    });
+    finishedReel3.current.forEach((item, index) => {
+      // console.log(item.getBoundingClientRect().top);
+      if (
+        item.getBoundingClientRect().top >= top &&
+        item.getBoundingClientRect().bottom <= bottom
+      ) {
+        third.push(item.id);
+      }
+      setVisibleVertical3(third);
+    });
+  };
+
+  useEffect(() => {
+    let id;
+    if (top && bottom && started === false) {
+      id = setTimeout(() => {
+        position();
+      }, 500);
     }
+    return () => {
+      clearTimeout(id);
+    };
   }, [top, bottom, finishedReel1, finishedReel2, finishedReel3, started]);
 
   useEffect(() => {
